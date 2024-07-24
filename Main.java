@@ -1,52 +1,65 @@
 import java.util.Scanner;
-class Main {
-  private static String word = "games";
-  private static int attempts = 6;
-  static int currentAttempt = 0;
-  private static String[] guess = {"", "", "", "", "", ""};
- static String yellow = "\u001B[33m";
-  static String green = "\u001B[32m";
-  static String white = "\u001B[37m";
-  static String red = "\u001B[31m";
-  static boolean guessCorrect = false;
-  public static void main(String[] args) {
-    Scanner in = new Scanner(System.in);
-    //String[] test = inputDetermine(in.nextLine());
-    for (int a = currentAttempt; a < attempts && !guessCorrect; a++){
-      System.out.println( white + "Input: ");
-      String[] test = inputDetermine(in.nextLine());
-      clear();
-      for (int i = 0; i < test.length; i++){
-        System.out.println(test[i]);
-      }
-    }
-  }
 
-  public static String[] inputDetermine(String user){
-    String[] wordArray = word.split("");
-    String[] userArray = user.split("");
-    if (wordArray.length != userArray.length){
-      System.out.println("Error: User input length does not match hidden word length");
-      System.exit(1);
+class Main {
+    private static final String WORD = "games";
+    private static final int ATTEMPTS = 6;
+    private static int currentAttempt = 0;
+    private static final String[] guesses = new String[ATTEMPTS];
+    private static final String YELLOW = "\u001B[33m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String RED = "\u001B[31m";
+    private static final String WHITE = "\u001B[37m";
+    private static boolean guessCorrect = false;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (currentAttempt < ATTEMPTS && !guessCorrect) {
+            System.out.print(WHITE + "Input: ");
+            String userInput = scanner.nextLine();
+            String[] processedInput = processInput(userInput);
+            clearConsole();
+
+            for (String guess : guesses) {
+                if (guess != null) {
+                    System.out.println(guess);
+                }
+            }
+        }
     }
-   // if (currentAttempt == attempts) System.exit(1);
-    for (int i = 0; i < userArray.length; i++){
-      if (wordArray[i].equalsIgnoreCase(userArray[i])){
-        guess[currentAttempt] += green + userArray[i];
-      }
-      else if (word.contains(userArray[i])){
-        guess[currentAttempt] += yellow + userArray[i];
-      }
-      else {
-        guess[currentAttempt] += red + userArray[i];
-      }
+
+    private static String[] processInput(String userInput) {
+        if (userInput.length() != WORD.length()) {
+            System.out.println("Error: User input length does not match hidden word length");
+            System.exit(1);
+        }
+
+        StringBuilder currentGuess = new StringBuilder();
+        for (int i = 0; i < userInput.length(); i++) {
+            char userChar = userInput.charAt(i);
+            char wordChar = WORD.charAt(i);
+
+            if (wordChar == userChar) {
+                currentGuess.append(GREEN).append(userChar);
+            } else if (WORD.indexOf(userChar) >= 0) {
+                currentGuess.append(YELLOW).append(userChar);
+            } else {
+                currentGuess.append(RED).append(userChar);
+            }
+        }
+
+        guesses[currentAttempt] = currentGuess.toString();
+        currentAttempt++;
+
+        if (WORD.equals(userInput)) {
+            guessCorrect = true;
+        }
+
+        return guesses;
     }
-    currentAttempt++;
-    if (word == user) guessCorrect = true;
-    return guess;
-  }
-  public static void clear(){
-    System.out.print("\033[H\033[2J");  
-    System.out.flush();  
-  }
+
+    private static void clearConsole() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 }
